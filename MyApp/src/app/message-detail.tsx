@@ -14,7 +14,7 @@ import {
   useLocalSearchParams,
 } from 'expo-router';
 
-import { getMessageById } from '@/data/dummyMessages';
+import { dummyMessages } from '@/data/dummyMessages';
 
 import {
   formatMessageTime,
@@ -24,31 +24,27 @@ import {
 } from '@/utils/messageRisk';
 
 export default function MessageDetailScreen() {
-  const params = useLocalSearchParams<{ id?: string }>();
+  const params = useLocalSearchParams<{
+    id?: string;
+  }>();
 
-  const id = Array.isArray(params.id)
-    ? params.id[0]
-    : params.id;
-
-  const message = id
-    ? getMessageById(id)
-    : undefined;
+  const message = dummyMessages.find(
+    (item) => item.id === params.id
+  );
 
   if (!message) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.notFound}>
+        <View style={styles.notFoundContainer}>
           <Text style={styles.notFoundTitle}>
             Message not found
           </Text>
 
           <TouchableOpacity
-            style={styles.backToMessages}
+            style={styles.backHomeButton}
             onPress={() => router.back()}
           >
-            <Text style={styles.backToMessagesText}>
-              Go Back
-            </Text>
+            <Text style={styles.backHomeText}>Go Back</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -59,23 +55,20 @@ export default function MessageDetailScreen() {
   const riskColor = getRiskColor(risk);
   const riskBackground = getRiskBackground(risk);
 
+  const dangerScore = Math.min(
+    Math.max(message.mlResult.dangerScore, 0),
+    100
+  );
+
   const isHighRisk = risk === 'High Risk';
   const isMediumRisk = risk === 'Medium Risk';
   const isSafe = risk === 'Safe';
 
-  const title = isHighRisk
-    ? 'High Risk Message'
-    : isMediumRisk
-      ? 'Medium Risk'
-      : 'Message Looks Safe';
-
   const description = isHighRisk
-    ? 'This message contains strong indicators of a possible SMS scam. Avoid interacting with suspicious links or requests.'
+    ? 'This message contains strong scam indicators. Avoid clicking links or sharing personal information.'
     : isMediumRisk
       ? 'This message contains some suspicious characteristics. Review it carefully before taking action.'
       : 'No significant scam indicators were detected in this message.';
-
-  const statusIcon = isSafe ? '✓' : '!';
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -84,6 +77,8 @@ export default function MessageDetailScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
+        {/* HEADER */}
+
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
@@ -98,6 +93,8 @@ export default function MessageDetailScreen() {
 
           <View style={styles.headerSpace} />
         </View>
+
+        {/* RISK STATUS */}
 
         <View style={styles.statusArea}>
           <View
@@ -115,7 +112,7 @@ export default function MessageDetailScreen() {
                 { color: riskColor },
               ]}
             >
-              {statusIcon}
+              {isSafe ? '✓' : '!'}
             </Text>
           </View>
 
@@ -125,7 +122,7 @@ export default function MessageDetailScreen() {
               { color: riskColor },
             ]}
           >
-            {title}
+            {risk}
           </Text>
 
           <Text style={styles.statusDescription}>
@@ -133,9 +130,11 @@ export default function MessageDetailScreen() {
           </Text>
         </View>
 
+        {/* MESSAGE */}
+
         <View style={styles.card}>
           <View style={styles.senderRow}>
-            <View style={styles.senderDetails}>
+            <View style={styles.senderInfo}>
               <Text style={styles.sender}>
                 {message.sender}
               </Text>
@@ -149,8 +148,8 @@ export default function MessageDetailScreen() {
               style={[
                 styles.badge,
                 {
-                  borderColor: riskColor,
                   backgroundColor: riskBackground,
+                  borderColor: riskColor,
                 },
               ]}
             >
@@ -170,6 +169,8 @@ export default function MessageDetailScreen() {
           </Text>
         </View>
 
+        {/* RISK SCORE */}
+
         <View style={styles.card}>
           <View style={styles.scoreRow}>
             <Text style={styles.sectionTitle}>
@@ -182,7 +183,7 @@ export default function MessageDetailScreen() {
                 { color: riskColor },
               ]}
             >
-              {message.mlResult.dangerScore}/100
+              {dangerScore}/100
             </Text>
           </View>
 
@@ -191,187 +192,138 @@ export default function MessageDetailScreen() {
               style={[
                 styles.progressFill,
                 {
-                  width: `${Math.min(
-                    Math.max(
-                      message.mlResult.dangerScore,
-                      0
-                    ),
-                    100
-                  )}%`,
+                  width: `${dangerScore}%`,
                   backgroundColor: riskColor,
                 },
               ]}
             />
           </View>
 
-          <View style={styles.confidenceRow}>
-            <Text style={styles.confidenceLabel}>
-              AI Confidence
-            </Text>
-
-            <Text style={styles.confidenceValue}>
-              {Math.round(
-                message.mlResult.confidence * 100
-              )}%
-            </Text>
-          </View>
+          <Text style={styles.confidence}>
+            AI Confidence:{' '}
+            {Math.round(message.mlResult.confidence * 100)}%
+          </Text>
         </View>
+
+        {/* AI ANALYSIS */}
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>
-            AI Classification
+            AI Analysis
           </Text>
 
-          <View style={styles.classificationRow}>
-            <Text style={styles.classificationLabel}>
-              Classification
-            </Text>
+          <Text style={styles.analysisLabel}>
+            Classification
+          </Text>
 
-            <Text
-              style={[
-                styles.classificationValue,
-                { color: riskColor },
-              ]}
-            >
-              {message.mlResult.label.toUpperCase()}
-            </Text>
-          </View>
+          <Text
+            style={[
+              styles.analysisValue,
+              { color: riskColor },
+            ]}
+          >
+            {message.mlResult.label.toUpperCase()}
+          </Text>
+
+          {message.mlResult.cleanedText ? (
+            <>
+              <Text style={styles.analysisLabel}>
+                Analysed Text
+              </Text>
+
+              <Text style={styles.analysisText}>
+                {message.mlResult.cleanedText}
+              </Text>
+            </>
+          ) : null}
+        </View>
+
+        {/* PROBABILITIES */}
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>
+            Detection Probability
+          </Text>
 
           <ProbabilityRow
-            title="Normal"
+            label="Normal"
             value={message.mlResult.probabilities.normal}
           />
 
           <ProbabilityRow
-            title="Promo"
+            label="Promotional"
             value={message.mlResult.probabilities.promo}
           />
 
           <ProbabilityRow
-            title="Smish"
+            label="Smishing"
             value={message.mlResult.probabilities.smish}
           />
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>
-            Analysis
+        {/* FEEDBACK BUTTONS */}
+
+        <TouchableOpacity
+          style={styles.reportButton}
+          activeOpacity={0.85}
+          onPress={() =>
+            router.push({
+              pathname: '/report-message',
+              params: {
+                id: message.id,
+                sender: message.sender,
+                body: message.body,
+                action: 'scam',
+              },
+            })
+          }
+        >
+          <Text style={styles.reportText}>
+            Report Scam
           </Text>
+        </TouchableOpacity>
 
-          {isHighRisk && (
-            <>
-              <Text style={styles.point}>
-                • The AI model classified this message as smishing.
-              </Text>
-
-              <Text style={styles.point}>
-                • The message has a high danger score.
-              </Text>
-
-              <Text style={styles.point}>
-                • Avoid opening suspicious links or sharing personal information.
-              </Text>
-            </>
-          )}
-
-          {isMediumRisk && (
-            <>
-              <Text style={styles.point}>
-                • The AI model classified this message as promotional.
-              </Text>
-
-              <Text style={styles.point}>
-                • Review the sender and message carefully.
-              </Text>
-
-              <Text style={styles.point}>
-                • Avoid interacting with links if you do not recognise the sender.
-              </Text>
-            </>
-          )}
-
-          {isSafe && (
-            <>
-              <Text style={styles.safePoint}>
-                ✓ The AI model classified this message as normal.
-              </Text>
-
-              <Text style={styles.safePoint}>
-                ✓ The message has a low danger score.
-              </Text>
-
-              <Text style={styles.safePoint}>
-                ✓ No significant scam classification was detected.
-              </Text>
-            </>
-          )}
-        </View>
-
-        {!isSafe && (
-          <TouchableOpacity style={styles.reportButton}>
-            <Text style={styles.reportText}>
-              Report Scam
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        {!isSafe && (
-          <TouchableOpacity
-            style={[
-              styles.safeButton,
-              { borderColor: riskColor },
-            ]}
-          >
-            <Text
-              style={[
-                styles.safeButtonText,
-                { color: riskColor },
-              ]}
-            >
-              Mark as Safe
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        {isSafe && (
-          <View style={styles.safeNotice}>
-            <Text style={styles.safeNoticeTitle}>
-              You're protected
-            </Text>
-
-            <Text style={styles.safeNoticeText}>
-              Suraksha SMS will continue analysing messages for suspicious activity.
-            </Text>
-          </View>
-        )}
+        <TouchableOpacity
+          style={styles.safeButton}
+          activeOpacity={0.85}
+          onPress={() =>
+            router.push({
+              pathname: '/report-message',
+              params: {
+                id: message.id,
+                sender: message.sender,
+                body: message.body,
+                action: 'safe',
+              },
+            })
+          }
+        >
+          <Text style={styles.safeText}>
+            Mark as Safe
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 function ProbabilityRow({
-  title,
+  label,
   value,
 }: {
-  title: string;
+  label: string;
   value: number;
 }) {
-  const percentage = Math.round(value * 100);
+  const percentage =
+    value <= 1
+      ? Math.round(value * 100)
+      : Math.round(value);
 
   return (
     <View style={styles.probabilityRow}>
-      <Text style={styles.probabilityTitle}>
-        {title}
+      <Text style={styles.probabilityLabel}>
+        {label}
       </Text>
-
-      <View style={styles.probabilityTrack}>
-        <View
-          style={[
-            styles.probabilityFill,
-            { width: `${percentage}%` },
-          ]}
-        />
-      </View>
 
       <Text style={styles.probabilityValue}>
         {percentage}%
@@ -392,9 +344,12 @@ const styles = StyleSheet.create({
   },
 
   content: {
+    width: '100%',
+    maxWidth: 500,
+    alignSelf: 'center',
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 35,
+    paddingBottom: 40,
   },
 
   header: {
@@ -443,7 +398,7 @@ const styles = StyleSheet.create({
 
   statusIcon: {
     fontSize: 31,
-    fontWeight: '800',
+    fontWeight: '900',
   },
 
   statusTitle: {
@@ -476,9 +431,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  senderDetails: {
+  senderInfo: {
     flex: 1,
-    marginRight: 12,
+    marginRight: 10,
   },
 
   sender: {
@@ -541,85 +496,46 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 
-  confidenceRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 13,
-  },
-
-  confidenceLabel: {
-    color: '#8D9ABC',
+  confidence: {
+    color: '#7F8CAC',
     fontSize: 10,
+    marginTop: 9,
   },
 
-  confidenceValue: {
-    color: '#FFFFFF',
+  analysisLabel: {
+    color: '#7F8CAC',
     fontSize: 10,
-    fontWeight: '700',
-  },
-
-  classificationRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginTop: 14,
-    marginBottom: 14,
   },
 
-  classificationLabel: {
-    color: '#8D9ABC',
-    fontSize: 11,
-  },
-
-  classificationValue: {
-    fontSize: 11,
+  analysisValue: {
+    fontSize: 12,
     fontWeight: '800',
+    marginTop: 4,
+  },
+
+  analysisText: {
+    color: '#B6C0DA',
+    fontSize: 11,
+    lineHeight: 17,
+    marginTop: 4,
   },
 
   probabilityRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
+    justifyContent: 'space-between',
+    marginTop: 12,
   },
 
-  probabilityTitle: {
+  probabilityLabel: {
     color: '#9BA8C7',
-    fontSize: 10,
-    width: 55,
-  },
-
-  probabilityTrack: {
-    flex: 1,
-    height: 5,
-    backgroundColor: '#182748',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-
-  probabilityFill: {
-    height: '100%',
-    backgroundColor: '#7950F2',
-    borderRadius: 10,
+    fontSize: 11,
   },
 
   probabilityValue: {
-    color: '#B6C0DA',
-    width: 40,
-    textAlign: 'right',
-    fontSize: 10,
-  },
-
-  point: {
-    color: '#9BA8C7',
+    color: '#FFFFFF',
     fontSize: 11,
-    lineHeight: 18,
-    marginTop: 9,
-  },
-
-  safePoint: {
-    color: '#9BCDB8',
-    fontSize: 11,
-    lineHeight: 18,
-    marginTop: 9,
+    fontWeight: '700',
   },
 
   reportButton: {
@@ -641,58 +557,39 @@ const styles = StyleSheet.create({
     minHeight: 50,
     borderRadius: 14,
     borderWidth: 1,
+    borderColor: '#13D67A',
     justifyContent: 'center',
     alignItems: 'center',
   },
 
-  safeButtonText: {
-    fontSize: 13,
-    fontWeight: '700',
-  },
-
-  safeNotice: {
-    backgroundColor: '#0B3027',
-    borderWidth: 1,
-    borderColor: '#146B4A',
-    borderRadius: 16,
-    padding: 15,
-  },
-
-  safeNoticeTitle: {
+  safeText: {
     color: '#13D67A',
     fontSize: 13,
     fontWeight: '700',
   },
 
-  safeNoticeText: {
-    color: '#8EB7A8',
-    fontSize: 10,
-    lineHeight: 16,
-    marginTop: 6,
-  },
-
-  notFound: {
+  notFoundContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 30,
+    padding: 20,
   },
 
   notFoundTitle: {
     color: '#FFFFFF',
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: '800',
     marginBottom: 20,
   },
 
-  backToMessages: {
+  backHomeButton: {
     backgroundColor: '#7047EB',
+    borderRadius: 12,
     paddingHorizontal: 25,
     paddingVertical: 13,
-    borderRadius: 12,
   },
 
-  backToMessagesText: {
+  backHomeText: {
     color: '#FFFFFF',
     fontWeight: '700',
   },
