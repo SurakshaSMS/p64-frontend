@@ -1,3 +1,4 @@
+import { routes } from '@/constants/routes';
 import { router } from 'expo-router';
 import {
   View,
@@ -56,7 +57,7 @@ export default function SetupScreen() {
             <View style={styles.footer}>
               <TouchableOpacity
                 style={styles.primaryButton}
-                onPress={() => router.push('/onboarding/home')}
+                onPress={() => router.push(routes.dashboard.home)}
               >
                 <Text style={styles.primaryText}>Continue to Dashboard</Text>
                 <Text style={styles.arrow}>→</Text>
