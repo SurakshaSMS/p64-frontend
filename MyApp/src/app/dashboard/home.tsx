@@ -121,7 +121,7 @@ export default function DashboardHomeScreen() {
             icon="chatbubble-ellipses-outline"
             title="All Messages"
             background="#164EAA"
-            onPress={() => router.push('/all-messages')}
+            onPress={() => router.push('/messages/all-messages')}
           />
 
           <QuickAction
