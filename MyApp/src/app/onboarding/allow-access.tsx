@@ -15,28 +15,38 @@ import { ClassifiedSmsMessage } from "../../types/message.type";
 import { useSmsStore } from "../../stores/useSmsStore";
 import { routes } from "../../constants/routes";
 import { scanAndStoreSmsMessages } from "@/services/smsScan.service";
+import { prepareLocalModelFile } from "@/services/modelCache.service";
 export default function AllowAccessScreen() {
   const [error, setError] = useState<string | null>(null);
   const [classifiedMessages, setClassifiedMessages] = useState<
     ClassifiedSmsMessage[]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
-  const smsStore = useSmsStore();
   const handleAllowAccess = async () => {
     if (Platform.OS === "android") {
       try {
+        console.log("1. Button pressed");
         setIsLoading(true);
         setError(null);
 
+        console.log("2. Requesting SMS permission");
         const granted = await requestSmsPermission();
 
         if (!granted) {
+          console.log("SMS permission was not granted.");
           setError("SMS permission was not granted.");
           return;
         }
 
+        
+        console.log("3. Permission result:", granted);
+        console.log("4. Preparing local model");
+        await prepareLocalModelFile();
+
+        console.log("6. Scanning SMS");
         const result = await scanAndStoreSmsMessages(30);
         console.log(result);
+        
 
         router.replace(routes.dashboard.home);
 

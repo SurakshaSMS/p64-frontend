@@ -1,6 +1,6 @@
 {
   "name": "myapp",
-  "main": "expo-router/entry",
+  "main": "index.js",
   "version": "1.0.0",
   "dependencies": {
     "@expo/ui": "~56.0.26",
@@ -9,10 +9,11 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "axios": "^1.16.1",
     "expo": "~56.0.20",
-    "expo-asset": "~56.0.24",
+    "expo-asset": "~56.0.25",
     "expo-blur": "~56.0.4",
     "expo-constants": "~56.0.15",
     "expo-device": "~56.0.4",
+    "expo-file-system": "~56.0.11",
     "expo-font": "~56.0.5",
     "expo-glass-effect": "~56.0.4",
     "expo-image": "~56.0.12",
@@ -51,7 +52,10 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "copy:onnx": "node scripts/copy-onnx-model.js",
+    "android:run": "npm run copy:onnx && npx expo run:android",
+    "android:prebuild": "npx expo prebuild --clean && npm run copy:onnx"
   },
   "private": true
 }

@@ -1,17 +1,16 @@
 import * as ort from "onnxruntime-react-native";
 import { Asset } from "expo-asset";
-
+import { getCachedModelPath, prepareLocalModelFile } from "@/services/modelCache.service";
 import { tokenizeSms } from "./tokenizesms";
 
 const MAX_LENGTH = 64;
+let session: ort.InferenceSession | null = null;
 
 const idToLabel: Record<number, "normal" | "promo" | "smish"> = {
   0: "normal",
   1: "promo",
   2: "smish",
 };
-
-let session: ort.InferenceSession | null = null;
 
 function toInt64Tensor(values: number[]) {
   return new ort.Tensor(
@@ -40,18 +39,20 @@ function calculateDangerScore(probabilities: number[]) {
 }
 
 export async function loadSmishingModel() {
-  if (session) return session;
+  if (session) {
+    return session;
+  }
 
-  const asset = Asset.fromModule(require("../../assets/ml/final_model/model.onnx"));
-  await asset.downloadAsync();
+  let modelPath = await getCachedModelPath();
 
-  const modelPath = asset.localUri ?? asset.uri;
+  if (!modelPath) {
+    modelPath = await prepareLocalModelFile();
+  }
 
   session = await ort.InferenceSession.create(modelPath);
 
   return session;
 }
-
 export async function predictSms(text: string) {
   const currentSession = await loadSmishingModel();
 

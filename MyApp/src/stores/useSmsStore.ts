@@ -1,12 +1,15 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { ClassifiedSmsMessage, FlaggedSmsMessage, SmsMessage } from "../types/message.type";
 
+import {
+  FlaggedSmsMessage,
+  SmsMessage,
+} from "@/types/message.type";
 
 type SmsStore = {
   rawMessages: SmsMessage[];
-  classifiedMessages: ClassifiedSmsMessage[];
+  flaggedMessages: FlaggedSmsMessage[];
 
   setRawMessages: (messages: SmsMessage[]) => void;
   setFlaggedMessages: (messages: FlaggedSmsMessage[]) => void;
@@ -17,7 +20,7 @@ type SmsStore = {
   clearMessages: () => void;
 };
 
-function mergeMessagesById<T extends { id: string }>(
+function mergeMessagesById<T extends { id: string; date: number }>(
   existingMessages: T[],
   newMessages: T[]
 ): T[] {
@@ -31,7 +34,7 @@ function mergeMessagesById<T extends { id: string }>(
     messageMap.set(message.id, message);
   }
 
-  return Array.from(messageMap.values()).sort((a: any, b: any) => {
+  return Array.from(messageMap.values()).sort((a, b) => {
     return b.date - a.date;
   });
 }
@@ -40,35 +43,42 @@ export const useSmsStore = create<SmsStore>()(
   persist(
     (set) => ({
       rawMessages: [],
-      classifiedMessages: [],
-      alertItems: [],
+      flaggedMessages: [],
 
       setRawMessages: (messages) => {
-        set({ rawMessages: messages });
-      },
-      setFlaggedMessages: (messages) => {
-        set({ classifiedMessages: messages });
+        set({
+          rawMessages: messages,
+        });
       },
 
+      setFlaggedMessages: (messages) => {
+        set({
+          flaggedMessages: messages,
+        });
+      },
 
       appendRawMessages: (messages) => {
         set((state) => ({
-          rawMessages: mergeMessagesById(state.rawMessages, messages),
+          rawMessages: mergeMessagesById(
+            state.rawMessages,
+            messages
+          ),
         }));
       },
 
       appendFlaggedMessages: (messages) => {
         set((state) => ({
-          classifiedMessages: mergeMessagesById(
-            state.classifiedMessages,
+          flaggedMessages: mergeMessagesById(
+            state.flaggedMessages,
             messages
           ),
         }));
       },
+
       clearMessages: () => {
         set({
           rawMessages: [],
-          classifiedMessages: [],
+          flaggedMessages: [],
         });
       },
     }),

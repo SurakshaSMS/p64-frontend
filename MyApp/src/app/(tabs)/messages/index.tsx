@@ -14,7 +14,7 @@ import { typography } from "@/constants/typography";
 export default function AllMessagesScreen() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [search, setSearch] = useState("");
-  const messages = useSmsStore((state) => state.classifiedMessages);
+  const messages = useSmsStore((state) => state.flaggedMessages);
 
   /* =======================================================
      SEARCH + FILTER

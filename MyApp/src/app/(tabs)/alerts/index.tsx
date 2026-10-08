@@ -24,7 +24,7 @@ const clearAlerts = () => {
 export default function AlertHistoryScreen() {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>("All");
 
-  const alerts: AlertItem[] = dummyAlertItems;
+  const alerts: AlertItem[] = useAlertStore((state) => state.alertItems);
   alerts.filter((alert) => alert.unread);
 
   const filteredAlerts = useMemo(() => {

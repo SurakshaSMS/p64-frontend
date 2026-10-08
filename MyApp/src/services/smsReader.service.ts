@@ -12,27 +12,31 @@ import SmsReader, {
 import {
   MLSmsMessage,
 } from '@/types/message.type';
-export async function requestSmsPermission(): Promise<boolean> {
-  if (Platform.OS !== 'android') {
-    throw new Error(
-      'SMS retrieval is only supported on Android.'
-    );
+export async function requestSmsPermission() {
+  if (Platform.OS !== "android") {
+    return false;
   }
 
-  const result = await PermissionsAndroid.request(
+  const result = await PermissionsAndroid.requestMultiple([
     PermissionsAndroid.PERMISSIONS.READ_SMS,
-    {
-      title: 'SMS Access',
-      message:
-        'Suraksha-SMS needs access to your SMS messages so it can analyse them for potential smishing threats.',
-      buttonPositive: 'Allow',
-      buttonNegative: 'Deny',
-    }
-  );
+    PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
+  ]);
 
-  return result === PermissionsAndroid.RESULTS.GRANTED;
+  console.log("SMS permission details:", result);
+
+  const readSmsGranted =
+    result[PermissionsAndroid.PERMISSIONS.READ_SMS] ===
+    PermissionsAndroid.RESULTS.GRANTED;
+
+  const receiveSmsGranted =
+    result[PermissionsAndroid.PERMISSIONS.RECEIVE_SMS] ===
+    PermissionsAndroid.RESULTS.GRANTED;
+
+  console.log("READ_SMS granted:", readSmsGranted);
+  console.log("RECEIVE_SMS granted:", receiveSmsGranted);
+
+  return readSmsGranted && receiveSmsGranted;
 }
-
 export async function getSmsMessages(limit: number): Promise<MLSmsMessage[]> {
   const messages: SmsMessage[] = await SmsReader.getMessages(limit);
 
