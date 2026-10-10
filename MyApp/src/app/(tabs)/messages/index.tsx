@@ -43,7 +43,7 @@ export default function AllMessagesScreen() {
 
       return matchesSearch && matchesFilter;
     });
-  }, [search, activeFilter, search]);
+  }, [search, activeFilter, messages]);
 
   /* =======================================================
      RISK COLOURS

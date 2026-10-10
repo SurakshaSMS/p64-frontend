@@ -48,9 +48,7 @@ export async function incomingSmsTask(data: IncomingSmsTaskData) {
     };
 
     smsStore.appendFlaggedMessages([flaggedMessage]);
-
     const alertItem = transformSmsToAlertItem(flaggedMessage);
-
     alertStore.appendAlertItems([alertItem]);
 
     console.log("Background SMS scanned:", flaggedMessage);

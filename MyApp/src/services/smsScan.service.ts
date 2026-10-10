@@ -20,7 +20,7 @@ export async function scanAndStoreSmsMessages(limit: number) {
     finalRisk: applySmsFlaggingRules(message),
   }))
   
-
+  
   smsStore.setFlaggedMessages(flaggedMessages);
 
   return {
