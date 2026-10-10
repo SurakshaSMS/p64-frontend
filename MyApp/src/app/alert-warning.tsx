@@ -38,7 +38,7 @@ export default function AlertWarningScreen() {
 
   const openFullDetails = () => {
     router.push({
-      pathname: '/high-risk-detail',
+      pathname: '/message-detail',
       params: {
         id: params.id ?? '',
         sender,
