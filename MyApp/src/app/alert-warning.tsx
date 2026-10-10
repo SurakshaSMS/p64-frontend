@@ -1,12 +1,12 @@
-import React from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+
+import { spacing } from '@/constants/spacing';
 
 import {
   router,
@@ -51,18 +51,11 @@ export default function AlertWarningScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
       <ScrollView
         style={styles.screen}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Text style={styles.backText}>‹</Text>
-        </TouchableOpacity>
 
         <View style={styles.warningArea}>
           <View style={styles.outerCircle}>
@@ -230,7 +223,6 @@ export default function AlertWarningScreen() {
           </Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
   );
 }
 
@@ -265,20 +257,15 @@ function Signal({
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#05091F',
-  },
 
   screen: {
     flex: 1,
-    backgroundColor: '#05091F',
   },
 
   content: {
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 35,
+    paddingHorizontal: spacing.contentWrapper.paddingHorizontal,
+    paddingTop: spacing.contentWrapper.paddingTop,
+    paddingBottom: spacing.contentWrapper.paddingBottom,
   },
 
   backButton: {
