@@ -12,6 +12,7 @@ import {
   router,
   useLocalSearchParams,
 } from 'expo-router';
+import { routes } from '@/constants/routes';
 
 type MessageParams = {
   id?: string;
@@ -38,7 +39,7 @@ export default function AlertWarningScreen() {
 
   const openFullDetails = () => {
     router.push({
-      pathname: '/message-detail',
+      pathname: routes.messages.detail,
       params: {
         id: params.id ?? '',
         sender,

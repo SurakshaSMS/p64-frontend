@@ -16,5 +16,14 @@ export const routes = {
   dashboard: {
     home:'/dashboard'
   },
+
+  messages:{
+    detail: "/messages/message-detail",
+    report: "/messages/report-message",
+  },
+
+  alerts: {
+    detail: "/alerts/alert-warning",
+  }
   
 } as const;

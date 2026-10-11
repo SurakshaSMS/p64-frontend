@@ -10,6 +10,9 @@ import {
   View,
 } from "react-native";
 import { typography } from "@/constants/typography";
+import { router } from "expo-router";
+import { routes } from "@/constants/routes";
+import { formatMessageTime, getRiskBackground, getRiskColor } from "@/utils/messageRisk";
 
 export default function AllMessagesScreen() {
   const [activeFilter, setActiveFilter] = useState("All");
@@ -44,46 +47,6 @@ export default function AllMessagesScreen() {
       return matchesSearch && matchesFilter;
     });
   }, [search, activeFilter, messages]);
-
-  /* =======================================================
-     RISK COLOURS
-  ======================================================= */
-
-  const getRiskColor = (risk: RiskType) => {
-    switch (risk) {
-      case "smish":
-        return "#FF2F68";
-
-      case "promo":
-        return "#FFB800";
-
-      case "normal":
-        return "#13D67A";
-
-      default:
-        return "#FFFFFF";
-    }
-  };
-
-  const getRiskBackground = (risk: RiskType) => {
-    switch (risk) {
-      case "smish":
-        return "#341327";
-
-      case "promo":
-        return "#352804";
-
-      case "normal":
-        return "#0C3125";
-
-      default:
-        return "#0D1B4D";
-    }
-  };
-
-  /* =======================================================
-     UI
-  ======================================================= */
 
   return (
     <ScrollView
@@ -167,15 +130,21 @@ export default function AllMessagesScreen() {
 
       <View style={styles.messageList}>
         {filteredMessages.map((message) => {
-          const riskColor = getRiskColor(message.mlResult.label);
+          const riskColor = getRiskColor(message.finalRisk.riskLevel);
 
-          const riskBackground = getRiskBackground(message.mlResult.label);
+          const riskBackground = getRiskBackground(message.finalRisk.riskLevel);
 
           return (
             <TouchableOpacity
               key={message.id}
               style={styles.card}
               activeOpacity={0.85}
+              onPress={() => {
+                router.push({
+                  pathname: routes.messages.detail,
+                  params: { id: message.id },
+                })
+              }}
             >
               {/* CARD HEADER */}
 
@@ -210,7 +179,7 @@ export default function AllMessagesScreen() {
                   <View style={styles.senderTextContainer}>
                     <Text style={styles.sender}>{message.sender}</Text>
 
-                    <Text style={styles.time}>{message.date}</Text>
+                    <Text style={styles.time}>{formatMessageTime(message.date)}</Text>
                   </View>
                 </View>
 

@@ -14,7 +14,8 @@ export const spacing = {
   contentWrapper:{
     paddingHorizontal: 20,
     paddingTop: 40,
-    paddingBottom: 35,
+    paddingBottom: 20,
+    marginBottom: 35,
   }
  
 };

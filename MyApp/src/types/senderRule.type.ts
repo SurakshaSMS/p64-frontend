@@ -3,3 +3,5 @@ export type SenderRule = {
   normalizedSender: string;
   createdAt: number;
 };
+
+export type SenderStatus = "blocked" | "safe" | "unknown";

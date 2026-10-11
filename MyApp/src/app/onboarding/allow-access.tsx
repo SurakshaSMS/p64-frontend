@@ -16,6 +16,7 @@ import { useSmsStore } from "../../stores/useSmsStore";
 import { routes } from "../../constants/routes";
 import { scanAndStoreSmsMessages } from "@/services/smsScan.service";
 import { prepareLocalModelFile } from "@/services/modelCache.service";
+import { spacing } from "@/constants/spacing";
 export default function AllowAccessScreen() {
   const [error, setError] = useState<string | null>(null);
   const [classifiedMessages, setClassifiedMessages] = useState<
@@ -64,7 +65,6 @@ export default function AllowAccessScreen() {
     <View style={styles.screen}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.content}>
           <View style={styles.logoBox}>
@@ -120,9 +120,6 @@ export default function AllowAccessScreen() {
               <Text style={styles.primaryText}>Allow Access</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => router.push("/onboarding/setup")}>
-              <Text style={styles.notNow}>Not Now</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -158,25 +155,24 @@ function PermissionRow({
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    width: "100%",
+  },
+
   screen: {
     flex: 1,
-
-    alignItems: "center",
-    justifyContent: "center",
+    paddingHorizontal: spacing.contentWrapper.paddingHorizontal,
   },
   container: {
     width: "100%",
-    maxWidth: 390,
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
   },
   content: {
     flex: 1,
     minHeight: 844,
     alignItems: "center",
-    paddingTop: 132,
+    paddingTop: spacing.contentWrapper.paddingTop + 30,
     paddingBottom: 42,
   },
   logoGlow: {
@@ -311,12 +307,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "900",
   },
-  notNow: {
-    color: "#7D8CC4",
-    fontSize: 13,
-    fontWeight: "500",
-    textAlign: "center",
-  },
+
   logoBox: {
     width: 76,
     height: 76,

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-
+import MarkAsSafeModal from '@/components/modals/MarkAsSafeModal';
 import {
   Alert,
-  Modal,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -16,6 +15,7 @@ import {
   router,
   useLocalSearchParams,
 } from 'expo-router';
+import MarkAsScamModal from '@/components/modals/MarkAsScamModal';
 
 type ReportReason = 'scam' | 'safe';
 
@@ -24,37 +24,38 @@ export default function ReportMessageScreen() {
     id?: string;
     sender?: string;
     body?: string;
-    action?: string;
   }>();
 
   const [reason, setReason] = useState<ReportReason>(
-    params.action === 'safe' ? 'safe' : 'scam'
+    'scam'
   );
 
   const [notes, setNotes] = useState('');
-  const [showSafeModal, setShowSafeModal] =
-    useState(params.action === 'safe');
+  const [showSafeModal, setShowSafeModal] = useState(false);
+  const [showScamModal, setShowScamModal] = useState(false);
 
-  const mockMarkAsScam = () => {
-    console.log('Mock AI feedback:', {
+  const markAsScam = () => {
+    console.log("Mock AI feedback:", {
       messageId: params.id,
-      classification: 'unsafe',
+      classification: "unsafe",
       notes,
     });
 
+    setShowScamModal(false);
+
     Alert.alert(
-      'Report Submitted',
-      'Thank you. Your feedback has been recorded for future AI detection.',
+      "Report Submitted",
+      "Thank you. Your feedback has been recorded for future AI detection.",
       [
         {
-          text: 'OK',
+          text: "OK",
           onPress: () => router.back(),
         },
       ]
     );
   };
 
-  const mockMarkAsSafe = () => {
+  const markAsSafe = () => {
     console.log('Mock AI feedback:', {
       messageId: params.id,
       classification: 'safe',
@@ -79,9 +80,10 @@ export default function ReportMessageScreen() {
     if (reason === 'safe') {
       setShowSafeModal(true);
       return;
+    }else{
+      setShowScamModal(true);
+      return;
     }
-
-    mockMarkAsScam();
   };
 
   const selectScam = () => {
@@ -99,14 +101,6 @@ export default function ReportMessageScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* BACK */}
-
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Text style={styles.backText}>‹</Text>
-        </TouchableOpacity>
 
         {/* HEADER */}
 
@@ -116,7 +110,7 @@ export default function ReportMessageScreen() {
           </View>
 
           <Text style={styles.title}>
-            Report Message
+            Flag Message
           </Text>
 
           <Text style={styles.subtitle}>
@@ -212,24 +206,6 @@ export default function ReportMessageScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* NOTES */}
-
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>
-            Additional Notes (Optional)
-          </Text>
-
-          <TextInput
-            style={styles.notesInput}
-            placeholder="Add more context about this message..."
-            placeholderTextColor="#65729A"
-            value={notes}
-            onChangeText={setNotes}
-            multiline
-            textAlignVertical="top"
-          />
-        </View>
-
         {/* MESSAGE INFORMATION */}
 
         <View style={styles.card}>
@@ -266,7 +242,7 @@ export default function ReportMessageScreen() {
           <Text style={styles.submitText}>
             {reason === 'safe'
               ? 'Mark as Safe'
-              : '⚑  Submit Report'}
+              : 'Mark as Scam'}
           </Text>
         </TouchableOpacity>
 
@@ -282,56 +258,17 @@ export default function ReportMessageScreen() {
 
       {/* MARK AS SAFE MODAL */}
 
-      <Modal
+      <MarkAsSafeModal
         visible={showSafeModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowSafeModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <View style={styles.safeCircleOuter}>
-              <View style={styles.safeCircle}>
-                <Text style={styles.safeShield}>✓</Text>
-              </View>
-            </View>
+        onClose={() => setShowSafeModal(false)}
+        onConfirm={markAsSafe}
+      />
 
-            <Text style={styles.modalTitle}>
-              Mark as Safe?
-            </Text>
-
-            <Text style={styles.modalDescription}>
-              Are you sure this message is safe? This will
-              help improve future detection.
-            </Text>
-
-            <View style={styles.feedbackBox}>
-              <Text style={styles.feedbackText}>
-                ✓ Your feedback trains our AI to detect scams better.
-              </Text>
-            </View>
-
-            <TouchableOpacity
-              style={styles.confirmButton}
-              onPress={mockMarkAsSafe}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.confirmText}>
-                ✓  Confirm
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.modalCancelButton}
-              onPress={() => setShowSafeModal(false)}
-            >
-              <Text style={styles.modalCancelText}>
-                ×  Cancel
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <MarkAsScamModal
+        visible={showScamModal}
+        onClose={() => setShowScamModal(false)}
+        onConfirm={markAsScam}
+      />
     </SafeAreaView>
   );
 }
@@ -339,12 +276,10 @@ export default function ReportMessageScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#07143D',
   },
 
   screen: {
     flex: 1,
-    backgroundColor: '#07143D',
   },
 
   content: {

@@ -34,7 +34,8 @@
         }
       ],
       "expo-router",
-       "./plugins/withBackgroundSms",
+      "./plugins/withModelAssetModule.js",
+      "./plugins/withBackgroundSms",
       "./plugins/withOnnxRuntimeManualLink",
       [
         "expo-splash-screen",

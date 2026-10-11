@@ -1,27 +1,14 @@
 import { ClassifiedSmsMessage } from '@/types/sms';
+import { RiskLevel } from '@/types/risk.type';
 
-export type RiskLevel = 'Safe' | 'Medium Risk' | 'High Risk';
 
-export const getRiskLevel = (
-  message: ClassifiedSmsMessage
-): RiskLevel => {
-  if (message.mlResult.label === 'smish') {
-    return 'High Risk';
-  }
-
-  if (message.mlResult.label === 'promo') {
-    return 'Medium Risk';
-  }
-
-  return 'Safe';
-};
 
 export const getRiskColor = (risk: RiskLevel) => {
-  if (risk === 'High Risk') {
+  if (risk === 'high') {
     return '#FF4D5E';
   }
 
-  if (risk === 'Medium Risk') {
+  if (risk === 'medium') {
     return '#FFB800';
   }
 
@@ -29,11 +16,11 @@ export const getRiskColor = (risk: RiskLevel) => {
 };
 
 export const getRiskBackground = (risk: RiskLevel) => {
-  if (risk === 'High Risk') {
+  if (risk === 'high') {
     return '#3B1624';
   }
 
-  if (risk === 'Medium Risk') {
+  if (risk === 'medium') {
     return '#493900';
   }
 

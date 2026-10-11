@@ -2,8 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { SenderRule } from "../types/senderRule.type";
+import { SenderStatus } from "../types/senderRule.type";
 
-type SenderStatus = "blocked" | "safe" | "unknown";
 
 type SenderTrustStore = {
   blockedSenders: SenderRule[];
