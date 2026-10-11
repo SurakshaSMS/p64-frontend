@@ -16,21 +16,24 @@ import {
   useLocalSearchParams,
 } from 'expo-router';
 import MarkAsScamModal from '@/components/modals/MarkAsScamModal';
+import { useSenderTrustStore } from '@/stores/useSenderTrustStore';
 
 type ReportReason = 'scam' | 'safe';
 
 export default function ReportMessageScreen() {
   const params = useLocalSearchParams<{
-    id?: string;
-    sender?: string;
-    body?: string;
+    id: string;
+    sender: string;
+    body: string;
   }>();
 
   const [reason, setReason] = useState<ReportReason>(
     'scam'
   );
 
-  const [notes, setNotes] = useState('');
+  const addBlockedSender = useSenderTrustStore((state) => state.blockSender);
+  const addSafeSender = useSenderTrustStore((state) => state.markSenderAsSafe);
+
   const [showSafeModal, setShowSafeModal] = useState(false);
   const [showScamModal, setShowScamModal] = useState(false);
 
@@ -38,11 +41,10 @@ export default function ReportMessageScreen() {
     console.log("Mock AI feedback:", {
       messageId: params.id,
       classification: "unsafe",
-      notes,
     });
 
     setShowScamModal(false);
-
+    addBlockedSender(params.sender);
     Alert.alert(
       "Report Submitted",
       "Thank you. Your feedback has been recorded for future AI detection.",
@@ -59,11 +61,11 @@ export default function ReportMessageScreen() {
     console.log('Mock AI feedback:', {
       messageId: params.id,
       classification: 'safe',
-      notes,
     });
 
     setShowSafeModal(false);
-
+    addSafeSender(params.sender);
+    
     Alert.alert(
       'Marked as Safe',
       'Thank you. Your feedback has been recorded for future AI detection.',
