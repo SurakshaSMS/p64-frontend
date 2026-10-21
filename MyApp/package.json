@@ -19,6 +19,7 @@
     "expo-image": "~56.0.12",
     "expo-linear-gradient": "~56.0.4",
     "expo-linking": "~56.0.17",
+    "expo-modules-core": "~56.0.27",
     "expo-router": "~56.2.19",
     "expo-secure-store": "~56.0.4",
     "expo-splash-screen": "~56.0.14",
@@ -41,7 +42,11 @@
   },
   "devDependencies": {
     "@react-native-community/cli": "^20.2.0",
+    "@react-native/jest-preset": "^0.86.3",
+    "@types/jest": "^29.5.14",
     "@types/react": "~19.2.2",
+    "jest": "~29.7.0",
+    "jest-expo": "~56.0.5",
     "patch-package": "^8.0.1",
     "typescript": "~6.0.3"
   },
@@ -54,7 +59,15 @@
     "postinstall": "patch-package",
     "copy:onnx": "node scripts/copy-onnx-model.js",
     "android:run": "npm run copy:onnx && npx expo run:android",
-    "android:prebuild": "npx expo prebuild --clean && npm run copy:onnx && node ./scripts/reset-project.js"
+    "android:prebuild": "npx expo prebuild --clean && npm run copy:onnx && node ./scripts/reset-project.js",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "testMatch": [
+      "**/*.spec.ts",
+      "**/*.spec.tsx"
+    ]
   },
   "private": true
 }
