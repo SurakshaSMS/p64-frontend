@@ -9,6 +9,13 @@ export const spacing = {
 
   button: {
     paddingHorizontal: 20,
+  },
+
+  contentWrapper:{
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
+    marginBottom: 35,
   }
  
 };

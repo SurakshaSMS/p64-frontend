@@ -1,6 +1,6 @@
 export const typography = {
   title: {
-    fontSize: 27,
+    fontSize: 30,
     fontWeight: '900' as const,
   },
   subtitle: {

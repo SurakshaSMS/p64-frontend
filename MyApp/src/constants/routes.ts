@@ -14,7 +14,16 @@ export const routes = {
     smsTest: '/testing/sms-test',
   },
   dashboard: {
-    home:'/dashboard/home'
+    home:'/dashboard'
   },
+
+  messages:{
+    detail: "/messages/message-detail",
+    report: "/messages/report-message",
+  },
+
+  alerts: {
+    detail: "/alerts/alert-warning",
+  }
   
 } as const;

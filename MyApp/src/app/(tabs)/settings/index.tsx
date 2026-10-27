@@ -575,47 +575,6 @@ export default function SettingsScreen() {
 
           <View style={styles.bottomContentSpacing} />
         </ScrollView>
-
-        <View style={styles.bottomNav}>
-          <BottomNavItem
-            icon="home-outline"
-            label="Home"
-            onPress={() =>
-              router.replace('/onboarding/home')
-            }
-          />
-
-          <BottomNavItem
-            icon="chatbubble-ellipses-outline"
-            label="Messages"
-            onPress={() =>
-              showUnavailableScreen('Messages')
-            }
-          />
-
-          <BottomNavItem
-            icon="shield-checkmark-outline"
-            label="AI Protect"
-            onPress={() =>
-              showUnavailableScreen('AI Protect')
-            }
-          />
-
-          <BottomNavItem
-            icon="warning-outline"
-            label="Alerts"
-            onPress={() =>
-              showUnavailableScreen('Alerts')
-            }
-          />
-
-          <BottomNavItem
-            icon="settings"
-            label="Settings"
-            active
-            onPress={() => undefined}
-          />
-        </View>
       </View>
   );
 }
@@ -670,6 +629,7 @@ function showUnavailableScreen(screenName: string) {
 const styles = StyleSheet.create({
 
   screen: {
+    marginTop: 40,
     flex: 1,
   },
 

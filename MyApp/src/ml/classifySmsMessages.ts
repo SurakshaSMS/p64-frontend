@@ -1,29 +1,8 @@
 import { predictSms } from "./smishingModel";
-
-export type MLSmsMessage = {
-  id: string;
-  body: string ;
-  date: number;
-  read: boolean;
-  sender: string;
-};
-
-export type ClassifiedSmsMessage = MLSmsMessage & {
-  mlResult: {
-    label: "normal" | "promo" | "smish";
-    cleanedText: string;
-    dangerScore: number;
-    confidence: number;
-    probabilities: {
-      normal: number;
-      promo: number;
-      smish: number;
-    };
-  };
-};
+import { ClassifiedSmsMessage, MLSmsMessage } from "../types/message.type";
 
 export async function classifySmsMessage(
-  sms: MLSmsMessage
+  sms: MLSmsMessage,
 ): Promise<ClassifiedSmsMessage> {
   const prediction = await predictSms(sms.body);
 
@@ -34,7 +13,7 @@ export async function classifySmsMessage(
 }
 
 export async function classifySmsMessages(
-  messages: MLSmsMessage[]
+  messages: MLSmsMessage[],
 ): Promise<ClassifiedSmsMessage[]> {
   const classifiedMessages: ClassifiedSmsMessage[] = [];
 
@@ -43,6 +22,5 @@ export async function classifySmsMessages(
     classifiedMessages.push(classifiedSms);
   }
 
-  
   return classifiedMessages;
 }

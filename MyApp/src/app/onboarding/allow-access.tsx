@@ -7,57 +7,72 @@ import {
   TouchableOpacity,
   ScrollView,
   ImageSourcePropType,
+  Platform,
 } from "react-native";
 import { Image } from "react-native";
-import {requestSmsPermission, getSmsMessages} from "../../sms/sms-retrieval";
-import { classifySmsMessages, ClassifiedSmsMessage } from "../../ml/classifySmsMessages";
-import {useSmsStore} from "../../stores/useSmsStore";
+import { requestSmsPermission } from "@/services/smsReader.service";
+import { ClassifiedSmsMessage } from "../../types/message.type";
+import { useSmsStore } from "../../stores/useSmsStore";
+import { routes } from "../../constants/routes";
+import { scanAndStoreSmsMessages } from "@/services/smsScan.service";
+import { prepareLocalModelFile } from "@/services/modelCache.service";
+import { spacing } from "@/constants/spacing";
+import { initializeNotifications } from "@/services/notification.service";
 export default function AllowAccessScreen() {
   const [error, setError] = useState<string | null>(null);
-  const [classifiedMessages, setClassifiedMessages] = useState<ClassifiedSmsMessage[]>([]);
+  const [classifiedMessages, setClassifiedMessages] = useState<
+    ClassifiedSmsMessage[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
-  const smsStore = useSmsStore();
-    const handleAllowAccess = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const handleAllowAccess = async () => {
+    if (Platform.OS === "android") {
+      try {
+        console.log("1. Button pressed");
+        setIsLoading(true);
+        setError(null);
 
-      const granted = await requestSmsPermission();
+        console.log("2. Requesting SMS permission");
+        const smsGranted = await requestSmsPermission();
+        const notificationGranted = await initializeNotifications();
+        if (!smsGranted || !notificationGranted) {
+          console.log("SMS permission was not granted.");
+          setError("SMS permission was not granted.");
+          return;
+        }
 
-      if (!granted) {
-        setError("SMS permission was not granted.");
-        return;
+        
+        console.log("3. Permission result:", { smsGranted, notificationGranted });
+        console.log("4. Preparing local model");
+        await prepareLocalModelFile();
+
+        console.log("6. Scanning SMS");
+        const result = await scanAndStoreSmsMessages(30);
+        console.log(result);
+        
+
+        router.replace(routes.dashboard.home);
+
+      } catch (err: any) {
+        console.error(err);
+        setError(err?.message ?? "Unable to retrieve SMS messages.");
+      } finally {
+        setIsLoading(false);
       }
-
-      const smsMessages = await getSmsMessages(30);
-      const classified = await classifySmsMessages(smsMessages);
-      smsStore.setClassifiedMessages(classified);
-      smsStore.setRawMessages(smsMessages);
-
-      console.log("Classified SMS:", classified);
-    } catch (err: any) {
-      console.error(err);
-
-      setError(
-        err?.message ??
-          "Unable to retrieve SMS messages."
-      );
-    } finally {
-      setIsLoading(false);
+    } else {
+      
     }
   };
-
   return (
     <View style={styles.screen}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.content}>
           <View style={styles.logoBox}>
-            <Image source={require('@/assets/images/onboarding/shield-check.png')} />
+            <Image
+              source={require("@/assets/images/onboarding/shield-check.png")}
+            />
           </View>
-           
 
           <Text style={styles.title}>Allow Access</Text>
 
@@ -68,7 +83,7 @@ export default function AllowAccessScreen() {
 
           <View style={styles.permissionCard}>
             <PermissionRow
-              icon={require('@/assets/images/onboarding/message-circle.png')}
+              icon={require("@/assets/images/onboarding/message-circle.png")}
               title="SMS Access"
               description="Read incoming SMS for scam detection"
             />
@@ -76,7 +91,7 @@ export default function AllowAccessScreen() {
             <View style={styles.divider} />
 
             <PermissionRow
-              icon={require('@/assets/images/onboarding/bell.png')}
+              icon={require("@/assets/images/onboarding/bell.png")}
               title="Alerts"
               description="Show real-time scam alerts"
             />
@@ -84,7 +99,7 @@ export default function AllowAccessScreen() {
             <View style={styles.divider} />
 
             <PermissionRow
-              icon={require('@/assets/images/onboarding/activity.png')}
+              icon={require("@/assets/images/onboarding/activity.png")}
               title="Background Activity"
               description="Monitor messages in the background"
             />
@@ -92,7 +107,7 @@ export default function AllowAccessScreen() {
             <View style={styles.divider} />
 
             <PermissionRow
-              icon={require('@/assets/images/onboarding/small-shield.png')}
+              icon={require("@/assets/images/onboarding/small-shield.png")}
               title="Data Safety"
               description="Keep your data secure on your device"
             />
@@ -106,9 +121,6 @@ export default function AllowAccessScreen() {
               <Text style={styles.primaryText}>Allow Access</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => router.push("/onboarding/setup")}>
-              <Text style={styles.notNow}>Not Now</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -144,25 +156,24 @@ function PermissionRow({
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    width: "100%",
+  },
+
   screen: {
     flex: 1,
-    
-    alignItems: "center",
-    justifyContent: "center",
+    paddingHorizontal: spacing.contentWrapper.paddingHorizontal,
   },
   container: {
     width: "100%",
-    maxWidth: 390,
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
   },
   content: {
     flex: 1,
     minHeight: 844,
     alignItems: "center",
-    paddingTop: 132,
+    paddingTop: spacing.contentWrapper.paddingTop + 30,
     paddingBottom: 42,
   },
   logoGlow: {
@@ -297,22 +308,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "900",
   },
-  notNow: {
-    color: "#7D8CC4",
-    fontSize: 13,
-    fontWeight: "500",
-    textAlign: "center",
-  },
+
   logoBox: {
     width: 76,
     height: 76,
     borderRadius: 22,
-    backgroundColor: '#7447F5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
+    backgroundColor: "#7447F5",
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
     marginBottom: 18,
-    shadowColor: '#7C3AED',
+    shadowColor: "#7C3AED",
     shadowOpacity: 0.5,
     shadowRadius: 26,
   },
