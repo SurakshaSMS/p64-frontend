@@ -1,53 +1,53 @@
 import { routes } from '@/constants/routes';
+import { spacing } from '@/constants/spacing';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useAlertStore } from '@/stores/useAlertStore';
+import { useSmsStore } from '@/stores/useSmsStore';
+import { getIconDetails, getRiskColor } from '@/utils/alertRisk.utils';
 
 export default function DashboardHomeScreen() {
+  
+  const alerts = useAlertStore((state) => state.alertItems).slice(0, 5);
+  const scannedStats = () => {
+    const scannedMessages = useSmsStore((state) => state.flaggedMessages);
+
+    const totalScannedMessages = scannedMessages.length;
+    const totalHighRiskMessage = scannedMessages.filter(
+      (message) => message.finalRisk.riskLevel === "high"
+    ).length;
+
+    const totalMediumRiskMessage = scannedMessages.filter(
+      (message) => message.finalRisk.riskLevel === "medium"
+    ).length;
+
+    const totalLowRiskMessage = scannedMessages.filter(
+      (message) => message.finalRisk.riskLevel === "low"
+    ).length;
+
+    return {
+      totalScannedMessages,
+      totalHighRiskMessage,
+      totalMediumRiskMessage,
+      totalLowRiskMessage,
+    };
+  }
+
+
   return (
-    <SafeAreaView style={styles.safeArea}>
       <ScrollView
         style={styles.screen}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* HEADER */}
-        <View style={styles.header}>
-          <View style={styles.brandRow}>
-            <View style={styles.logoBox}>
-              <Ionicons
-                name="shield-checkmark-outline"
-                size={22}
-                color="#FFFFFF"
-              />
-            </View>
-
-            <View>
-              <Text style={styles.appName}>Suraksha SMS</Text>
-              <Text style={styles.appSubtitle}>
-                AI-Powered SMS Protection
-              </Text>
-            </View>
-          </View>
-
-          <TouchableOpacity style={styles.notificationButton}>
-            <Ionicons
-              name="notifications-outline"
-              size={20}
-              color="#AEB8D6"
-            />
-
-            <View style={styles.notificationDot} />
-          </TouchableOpacity>
-        </View>
 
         {/* PROTECTION STATUS */}
         <View style={styles.protectionCard}>
@@ -87,26 +87,11 @@ export default function DashboardHomeScreen() {
                       size={13}
                       color="#8D98BD"
                     />
-                    <Text style={styles.statValue}>218</Text>
+                    <Text style={styles.statValue}>{scannedStats().totalScannedMessages}</Text>
                   </View>
 
                   <Text style={styles.statLabel}>
                     Messages Scanned
-                  </Text>
-                </View>
-
-                <View style={styles.stat}>
-                  <View style={styles.statValueRow}>
-                    <Ionicons
-                      name="ban-outline"
-                      size={13}
-                      color="#8D98BD"
-                    />
-                    <Text style={styles.statValue}>12</Text>
-                  </View>
-
-                  <Text style={styles.statLabel}>
-                    Threats Blocked
                   </Text>
                 </View>
               </View>
@@ -122,57 +107,30 @@ export default function DashboardHomeScreen() {
           </Text>
 
           <View style={styles.riskContent}>
-            <View style={styles.riskCircleOuter}>
-              <View style={styles.riskCircleMiddle}>
-                <View style={styles.riskCircleInner}>
-                  <Text style={styles.riskScore}>85</Text>
-                  <Text style={styles.riskOutOf}>/100</Text>
-                  <Text style={styles.riskLabel}>Risk Score</Text>
-                </View>
-              </View>
-            </View>
 
             <View style={styles.legend}>
               <RiskLegend
                 color="#FF3B5C"
                 label="High Risk"
-                value="5"
+                value={scannedStats().totalHighRiskMessage.toString()}
               />
               <RiskLegend
                 color="#FFB800"
                 label="Medium Risk"
-                value="8"
+                value={scannedStats().totalMediumRiskMessage.toString()}
               />
               <RiskLegend
                 color="#22C55E"
                 label="Safe"
-                value="32"
+                value={scannedStats().totalLowRiskMessage.toString()}
               />
               <RiskLegend
                 color="#3B82F6"
                 label="Scanned"
-                value="173"
+                value={scannedStats().totalScannedMessages.toString()}
               />
             </View>
           </View>
-
-          <TouchableOpacity style={styles.reportButton}>
-            <Ionicons
-              name="stats-chart-outline"
-              size={14}
-              color="#8794B8"
-            />
-
-            <Text style={styles.reportButtonText}>
-              View Full Report
-            </Text>
-
-            <Ionicons
-              name="chevron-forward"
-              size={14}
-              color="#8794B8"
-            />
-          </TouchableOpacity>
         </View>
 
         {/* RECENT ALERTS */}
@@ -181,38 +139,40 @@ export default function DashboardHomeScreen() {
             <Text style={styles.cardTitle}>Recent Alerts</Text>
 
             <TouchableOpacity
-              onPress={() => router.push(routes.dashboard.home)}
+              onPress={() => router.push(routes.alerts.home)}
             >
               <Text style={styles.viewAll}>View All ›</Text>
             </TouchableOpacity>
           </View>
+          {
+            (alerts.map((alert) => 
+            {
+              const IconDetails = getIconDetails(alert)
+              const title = () => {
+                if (alert.score >= 80) {
+                  return "High Risk: Mark as Scam"
+                }
+                if (alert.score >= 60) {
+                  return "Medium Risk: Mark as Scam"
+                }
+                return "Low Risk: Mark as Scam"
+              }
 
-          <AlertItem
-            icon="warning-outline"
-            iconColor="#FF3B5C"
-            iconBackground="#4B1825"
-            title="High Risk: Mark as Scam"
-            sender="From: +91 98765 43210"
-            time="10:42 AM"
-            badge="High"
-            badgeColor="#FF3B5C"
-            badgeBackground="#63202B"
-          />
-
-          <AlertItem
-            icon="shield-outline"
-            iconColor="#FFB800"
-            iconBackground="#4A3900"
-            title="Medium Risk: Unknown Sender"
-            sender="From: +91 91234 56789"
-            time="Yesterday"
-            badge="Medium"
-            badgeColor="#FFB800"
-            badgeBackground="#594500"
-          />
+              return (
+                <AlertItem
+                icon={IconDetails.icon}
+                iconColor={IconDetails.color}
+                iconBackground={IconDetails.background}
+                title={title()}
+                sender={alert.sender}
+                time={alert.time}
+                />
+              )
+            }))
+          }
+         
         </View>
       </ScrollView>
-    </SafeAreaView>
   );
 }
 
@@ -249,9 +209,6 @@ function AlertItem({
   title,
   sender,
   time,
-  badge,
-  badgeColor,
-  badgeBackground,
 }: {
   icon: React.ComponentProps<typeof Ionicons>['name'];
   iconColor: string;
@@ -259,9 +216,6 @@ function AlertItem({
   title: string;
   sender: string;
   time: string;
-  badge: string;
-  badgeColor: string;
-  badgeBackground: string;
 }) {
   return (
     <TouchableOpacity
@@ -296,33 +250,12 @@ function AlertItem({
 
       <View style={styles.alertRight}>
         <Text style={styles.alertTime}>{time}</Text>
-
-        <View
-          style={[
-            styles.riskBadge,
-            { backgroundColor: badgeBackground },
-          ]}
-        >
-          <Text
-            style={[
-              styles.riskBadgeText,
-              { color: badgeColor },
-            ]}
-          >
-            {badge}
-          </Text>
-        </View>
       </View>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#06143A',
-  },
-
   screen: {
     flex: 1,
     backgroundColor: '#06143A',
@@ -332,8 +265,8 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 600,
     alignSelf: 'center',
-    paddingHorizontal: 18,
-    paddingTop: 22,
+    paddingHorizontal: spacing.contentWrapper.paddingHorizontal,
+    paddingTop: spacing.contentWrapper.paddingTop,
     paddingBottom: 40,
   },
 
