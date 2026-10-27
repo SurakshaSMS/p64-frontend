@@ -142,11 +142,6 @@ export default function CreateAccountScreen() {
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={styles.scrollContent}
           >
-            <Link href="/onboarding/privacy" asChild>
-              <TouchableOpacity style={styles.backButton}>
-                <Text style={styles.backText}>‹</Text>
-              </TouchableOpacity>
-            </Link>
 
             <View style={styles.logoBox}>
               <Image source={require('@/assets/images/onboarding/shield-check.png')} />
@@ -277,16 +272,6 @@ export default function CreateAccountScreen() {
               <Text style={styles.dividerText}>or sign up with</Text>
               <View style={styles.line} />
             </View>
-
-            <TouchableOpacity style={styles.socialButton}>
-              <Text style={styles.google}>G</Text>
-              <Text style={styles.socialText}>Continue with Google</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.socialButton}>
-              <Text style={styles.apple}></Text>
-              <Text style={styles.socialText}>Continue with Apple</Text>
-            </TouchableOpacity>
 
             <Link href="/onboarding/sign-in" asChild>
               <TouchableOpacity>
@@ -546,19 +531,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginHorizontal: 12,
   },
-  socialButton: {
-    width: '100%',
-    height: 50,
-    borderRadius: 13,
-    backgroundColor: '#111F44',
-    borderWidth: 1,
-    borderColor: '#20335F',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 10,
-  },
+
   google: {
     color: '#FFFFFF',
     fontSize: 17,

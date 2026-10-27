@@ -11,11 +11,8 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import FullScreenLoader from '@/components/loaders/FullScreenLoader';
-import { routes } from "@/constants/routes";
-// Import SecureStore or AsyncStorage here if you need to save the login token
 import * as SecureStore from 'expo-secure-store';
 import AppInput from '@/components/form/AppInput';
-import BackButton from '@/components/buttons/BackButton';
 import { Image } from 'react-native';
 import PrimaryButton from '@/components/buttons/PrimaryButton';
 
@@ -82,7 +79,7 @@ export default function SignInScreen() {
          * Using replace prevents the user from pressing
          * Back and returning to Sign In after login.
          */
-        router.replace('/onboarding/home');
+        router.replace('/(tabs)/dashboard');
       } else {
         Alert.alert(
           'Error',
@@ -112,7 +109,6 @@ export default function SignInScreen() {
 
   return (
     <View style={styles.screen}>
-      <BackButton />
       <View style = {styles.container}>
         <FullScreenLoader visible={isLoading} message="Authenticating..." />
         
