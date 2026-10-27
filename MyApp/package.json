@@ -55,7 +55,7 @@
     "postinstall": "patch-package",
     "copy:onnx": "node scripts/copy-onnx-model.js",
     "android:run": "npm run copy:onnx && npx expo run:android",
-    "android:prebuild": "npx expo prebuild --clean && npm run copy:onnx && node ./scripts/reset-project.js"
+    "android:prebuild": "npx expo prebuild --clean && npm run copy:onnx"
   },
   "private": true
 }

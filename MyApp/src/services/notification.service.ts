@@ -34,7 +34,6 @@ export async function initializeNotifications() {
   if (!currentPermission.granted) {
     const permission =
       await Notifications.requestPermissionsAsync();
-
     return permission.granted;
   }
 

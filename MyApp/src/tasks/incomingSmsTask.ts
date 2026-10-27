@@ -6,6 +6,7 @@ import { transformSmsToAlertItem } from "@/transformers/alertItem.transformer";
 import { applySmsFlaggingRules } from "@/utils/smsFlagging.utils";
 import { shouldPushToAlerts } from "@/utils/pushAlerts.utils";
 import { showSmsAlertNotification } from "@/services/notification.service";
+import { useUserSettingsStore } from "@/stores/useSettingStore";
 type IncomingSmsTaskData = {
   id?: string;
   sender?: string;
@@ -55,7 +56,12 @@ export async function incomingSmsTask(data: IncomingSmsTaskData) {
     if (shouldAlert) {
       const alertItem = transformSmsToAlertItem(flaggedMessage);
       alertStore.appendAlertItems([alertItem]);
-      await showSmsAlertNotification(flaggedMessage);
+
+      const pushNotification = useUserSettingsStore.getState().pushNotifications;
+
+      if(pushNotification){
+        await showSmsAlertNotification(flaggedMessage);
+      }
     }
 
     console.log("Background SMS scanned:", flaggedMessage);

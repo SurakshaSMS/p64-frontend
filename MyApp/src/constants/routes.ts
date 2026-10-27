@@ -17,12 +17,16 @@ export const routes = {
     home:'/dashboard'
   },
 
+
+
   messages:{
     detail: "/messages/message-detail",
     report: "/messages/report-message",
   },
 
-  alerts: {
+  alerts: 
+  {
+    home: "/alerts",
     detail: "/alerts/alert-warning",
   }
   

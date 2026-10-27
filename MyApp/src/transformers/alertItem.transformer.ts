@@ -1,5 +1,5 @@
 import { AlertItem } from "@/types/alert.type";
-import { ClassifiedSmsMessage } from "@/types/message.type";
+import { FlaggedSmsMessage } from "@/types/message.type";
 
 function formatSmsTime(timestamp: number): string {
   const date = new Date(timestamp);
@@ -21,7 +21,7 @@ function formatSmsDate(timestamp: number): string {
 }
 
 export function transformSmsToAlertItem(
-  message: ClassifiedSmsMessage
+  message: FlaggedSmsMessage
 ): AlertItem {
   return {
     id: message.id,
@@ -36,7 +36,7 @@ export function transformSmsToAlertItem(
 }
 
 export function transformSmsToAlertItems(
-  messages: ClassifiedSmsMessage[]
+  messages: FlaggedSmsMessage[]
 ): AlertItem[] {
   return messages.map(transformSmsToAlertItem);
 }
