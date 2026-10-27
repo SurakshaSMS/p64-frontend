@@ -1,3 +1,5 @@
+// src/types/alert.type.ts
+
 export type AlertItem = {
   id: string;
   sender: string;
@@ -7,4 +9,5 @@ export type AlertItem = {
   timestamp: number;
   score: number;
   unread?: boolean;
+  dismissed?: boolean;
 };
