@@ -25,7 +25,16 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-asset",
+        {
+          "assets": [
+            "./assets/ml/final_model/model.onnx"
+          ]
+        }
+      ],
       "expo-router",
+       "./plugins/withBackgroundSms",
       "./plugins/withOnnxRuntimeManualLink",
       [
         "expo-splash-screen",

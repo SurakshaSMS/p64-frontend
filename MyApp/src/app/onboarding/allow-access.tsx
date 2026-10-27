@@ -7,46 +7,59 @@ import {
   TouchableOpacity,
   ScrollView,
   ImageSourcePropType,
+  Platform,
 } from "react-native";
 import { Image } from "react-native";
-import {requestSmsPermission, getSmsMessages} from "../../sms/sms-retrieval";
-import { classifySmsMessages, ClassifiedSmsMessage } from "../../ml/classifySmsMessages";
-import {useSmsStore} from "../../stores/useSmsStore";
+import { requestSmsPermission } from "@/services/smsReader.service";
+import { ClassifiedSmsMessage } from "../../types/message.type";
+import { useSmsStore } from "../../stores/useSmsStore";
+import { routes } from "../../constants/routes";
+import { scanAndStoreSmsMessages } from "@/services/smsScan.service";
+import { prepareLocalModelFile } from "@/services/modelCache.service";
 export default function AllowAccessScreen() {
   const [error, setError] = useState<string | null>(null);
-  const [classifiedMessages, setClassifiedMessages] = useState<ClassifiedSmsMessage[]>([]);
+  const [classifiedMessages, setClassifiedMessages] = useState<
+    ClassifiedSmsMessage[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
-  const smsStore = useSmsStore();
-    const handleAllowAccess = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const handleAllowAccess = async () => {
+    if (Platform.OS === "android") {
+      try {
+        console.log("1. Button pressed");
+        setIsLoading(true);
+        setError(null);
 
-      const granted = await requestSmsPermission();
+        console.log("2. Requesting SMS permission");
+        const granted = await requestSmsPermission();
 
-      if (!granted) {
-        setError("SMS permission was not granted.");
-        return;
+        if (!granted) {
+          console.log("SMS permission was not granted.");
+          setError("SMS permission was not granted.");
+          return;
+        }
+
+        
+        console.log("3. Permission result:", granted);
+        console.log("4. Preparing local model");
+        await prepareLocalModelFile();
+
+        console.log("6. Scanning SMS");
+        const result = await scanAndStoreSmsMessages(30);
+        console.log(result);
+        
+
+        router.replace(routes.dashboard.home);
+
+      } catch (err: any) {
+        console.error(err);
+        setError(err?.message ?? "Unable to retrieve SMS messages.");
+      } finally {
+        setIsLoading(false);
       }
-
-      const smsMessages = await getSmsMessages(30);
-      const classified = await classifySmsMessages(smsMessages);
-      smsStore.setClassifiedMessages(classified);
-      smsStore.setRawMessages(smsMessages);
-
-      console.log("Classified SMS:", classified);
-    } catch (err: any) {
-      console.error(err);
-
-      setError(
-        err?.message ??
-          "Unable to retrieve SMS messages."
-      );
-    } finally {
-      setIsLoading(false);
+    } else {
+      
     }
   };
-
   return (
     <View style={styles.screen}>
       <ScrollView
@@ -55,9 +68,10 @@ export default function AllowAccessScreen() {
       >
         <View style={styles.content}>
           <View style={styles.logoBox}>
-            <Image source={require('@/assets/images/onboarding/shield-check.png')} />
+            <Image
+              source={require("@/assets/images/onboarding/shield-check.png")}
+            />
           </View>
-           
 
           <Text style={styles.title}>Allow Access</Text>
 
@@ -68,7 +82,7 @@ export default function AllowAccessScreen() {
 
           <View style={styles.permissionCard}>
             <PermissionRow
-              icon={require('@/assets/images/onboarding/message-circle.png')}
+              icon={require("@/assets/images/onboarding/message-circle.png")}
               title="SMS Access"
               description="Read incoming SMS for scam detection"
             />
@@ -76,7 +90,7 @@ export default function AllowAccessScreen() {
             <View style={styles.divider} />
 
             <PermissionRow
-              icon={require('@/assets/images/onboarding/bell.png')}
+              icon={require("@/assets/images/onboarding/bell.png")}
               title="Alerts"
               description="Show real-time scam alerts"
             />
@@ -84,7 +98,7 @@ export default function AllowAccessScreen() {
             <View style={styles.divider} />
 
             <PermissionRow
-              icon={require('@/assets/images/onboarding/activity.png')}
+              icon={require("@/assets/images/onboarding/activity.png")}
               title="Background Activity"
               description="Monitor messages in the background"
             />
@@ -92,7 +106,7 @@ export default function AllowAccessScreen() {
             <View style={styles.divider} />
 
             <PermissionRow
-              icon={require('@/assets/images/onboarding/small-shield.png')}
+              icon={require("@/assets/images/onboarding/small-shield.png")}
               title="Data Safety"
               description="Keep your data secure on your device"
             />
@@ -146,7 +160,7 @@ function PermissionRow({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    
+
     alignItems: "center",
     justifyContent: "center",
   },
@@ -307,12 +321,12 @@ const styles = StyleSheet.create({
     width: 76,
     height: 76,
     borderRadius: 22,
-    backgroundColor: '#7447F5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
+    backgroundColor: "#7447F5",
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
     marginBottom: 18,
-    shadowColor: '#7C3AED',
+    shadowColor: "#7C3AED",
     shadowOpacity: 0.5,
     shadowRadius: 26,
   },

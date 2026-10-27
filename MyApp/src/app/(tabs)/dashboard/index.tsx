@@ -1,3 +1,4 @@
+import { routes } from '@/constants/routes';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
@@ -113,32 +114,6 @@ export default function DashboardHomeScreen() {
           </View>
         </View>
 
-        {/* QUICK ACTIONS */}
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
-
-        <View style={styles.quickActions}>
-          <QuickAction
-            icon="chatbubble-ellipses-outline"
-            title="All Messages"
-            background="#164EAA"
-            onPress={() => router.push('/messages/all-messages')}
-          />
-
-          <QuickAction
-            icon="shield-outline"
-            title="Alert History"
-            background="#55209A"
-            onPress={() => router.push('/alert-history')}
-          />
-
-          <QuickAction
-            icon="settings-outline"
-            title="Settings"
-            background="#086A42"
-            onPress={() => router.push('/settings/settings')}
-          />
-        </View>
-
         {/* RISK OVERVIEW */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Risk Overview</Text>
@@ -206,7 +181,7 @@ export default function DashboardHomeScreen() {
             <Text style={styles.cardTitle}>Recent Alerts</Text>
 
             <TouchableOpacity
-              onPress={() => router.push('/alert-history')}
+              onPress={() => router.push(routes.dashboard.home)}
             >
               <Text style={styles.viewAll}>View All ›</Text>
             </TouchableOpacity>
@@ -241,40 +216,6 @@ export default function DashboardHomeScreen() {
   );
 }
 
-function QuickAction({
-  icon,
-  title,
-  background,
-  onPress,
-}: {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  title: string;
-  background: string;
-  onPress: () => void;
-}) {
-  return (
-    <TouchableOpacity
-      style={styles.quickAction}
-      activeOpacity={0.8}
-      onPress={onPress}
-    >
-      <View
-        style={[
-          styles.quickIconBox,
-          { backgroundColor: background },
-        ]}
-      >
-        <Ionicons
-          name={icon}
-          size={21}
-          color="#FFFFFF"
-        />
-      </View>
-
-      <Text style={styles.quickActionText}>{title}</Text>
-    </TouchableOpacity>
-  );
-}
 
 function RiskLegend({
   color,
