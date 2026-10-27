@@ -1,6 +1,5 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import {
   View,
   Text,
@@ -38,10 +37,6 @@ export default function SignInScreen() {
       return;
     }
 
-    // if (!password.trim()) {
-    //   Alert.alert('Password Required', 'Please enter your password.');
-    //   return;
-    // }
 
     try {
       // Fetch the backend base URL from the .env file
@@ -64,21 +59,19 @@ export default function SignInScreen() {
       if (response.data && accessToken) {
         console.log('Login successful');
 
-        /*
-         * Securely store the access token on the device.
-         * This token will later be removed when the
-         * user logs out.
-         */
+       
         await SecureStore.setItemAsync(
           'accessToken',
-          accessToken
+          accessToken,
         );
 
-        /*
-         * Replace the Sign In screen with Home.
-         * Using replace prevents the user from pressing
-         * Back and returning to Sign In after login.
-         */
+        
+        await SecureStore.setItemAsync(
+          'userName',
+          user.name,
+        );
+
+       
         router.replace('/(tabs)/dashboard');
       } else {
         Alert.alert(
