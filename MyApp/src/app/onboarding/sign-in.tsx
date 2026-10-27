@@ -1,6 +1,5 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import {
   View,
   Text,
@@ -11,11 +10,8 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import FullScreenLoader from '@/components/loaders/FullScreenLoader';
-import { routes } from "@/constants/routes";
-// Import SecureStore or AsyncStorage here if you need to save the login token
 import * as SecureStore from 'expo-secure-store';
 import AppInput from '@/components/form/AppInput';
-import BackButton from '@/components/buttons/BackButton';
 import { Image } from 'react-native';
 import PrimaryButton from '@/components/buttons/PrimaryButton';
 
@@ -41,10 +37,6 @@ export default function SignInScreen() {
       return;
     }
 
-    // if (!password.trim()) {
-    //   Alert.alert('Password Required', 'Please enter your password.');
-    //   return;
-    // }
 
     try {
       // Fetch the backend base URL from the .env file
@@ -67,22 +59,20 @@ export default function SignInScreen() {
       if (response.data && accessToken) {
         console.log('Login successful');
 
-        /*
-         * Securely store the access token on the device.
-         * This token will later be removed when the
-         * user logs out.
-         */
+       
         await SecureStore.setItemAsync(
           'accessToken',
-          accessToken
+          accessToken,
         );
 
-        /*
-         * Replace the Sign In screen with Home.
-         * Using replace prevents the user from pressing
-         * Back and returning to Sign In after login.
-         */
-        router.replace('/onboarding/home');
+        
+        await SecureStore.setItemAsync(
+          'userName',
+          user.name,
+        );
+
+       
+        router.replace('/(tabs)/dashboard');
       } else {
         Alert.alert(
           'Error',
@@ -112,7 +102,6 @@ export default function SignInScreen() {
 
   return (
     <View style={styles.screen}>
-      <BackButton />
       <View style = {styles.container}>
         <FullScreenLoader visible={isLoading} message="Authenticating..." />
         

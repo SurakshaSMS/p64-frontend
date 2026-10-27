@@ -17,6 +17,7 @@ import { routes } from "../../constants/routes";
 import { scanAndStoreSmsMessages } from "@/services/smsScan.service";
 import { prepareLocalModelFile } from "@/services/modelCache.service";
 import { spacing } from "@/constants/spacing";
+import { initializeNotifications } from "@/services/notification.service";
 export default function AllowAccessScreen() {
   const [error, setError] = useState<string | null>(null);
   const [classifiedMessages, setClassifiedMessages] = useState<
@@ -31,16 +32,16 @@ export default function AllowAccessScreen() {
         setError(null);
 
         console.log("2. Requesting SMS permission");
-        const granted = await requestSmsPermission();
-
-        if (!granted) {
+        const smsGranted = await requestSmsPermission();
+        const notificationGranted = await initializeNotifications();
+        if (!smsGranted || !notificationGranted) {
           console.log("SMS permission was not granted.");
           setError("SMS permission was not granted.");
           return;
         }
 
         
-        console.log("3. Permission result:", granted);
+        console.log("3. Permission result:", { smsGranted, notificationGranted });
         console.log("4. Preparing local model");
         await prepareLocalModelFile();
 

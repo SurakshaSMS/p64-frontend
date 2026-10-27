@@ -9,12 +9,12 @@ import {
 } from "react-native";
 import { typography } from "@/constants/typography";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import { AlertItem } from "@/types/alert.type";
 import { useAlertStore } from "@/stores/useAlertStore";
 import { groupAlertsByDate } from "@/utils/alertDate.utils";
-import { dummyAlertItems } from "../../dummydata/dummydata";
-
+import { getRiskColor, getIconDetails } from "@/utils/alertRisk.utils";
+import { router } from "expo-router";
+import { routes } from "@/constants/routes";
 type FilterType = "All" | "Unread" | "High Risk" | "Medium Risk";
 
 const clearAlerts = () => {
@@ -37,63 +37,30 @@ export default function AlertHistoryScreen() {
     }
 
     return alerts;
-  }, [selectedFilter]);
+  }, [alerts, selectedFilter]);
 
   const { todayAlerts, yesterdayAlerts, pastAlerts } = useMemo(() => {
     return groupAlertsByDate(filteredAlerts);
   }, [alerts]);
 
-  const getRiskColor = (score: number) => {
-    if (score >= 80) {
-      return "#FF315E";
-    }
-
-    if (score >= 60) {
-      return "#FFB800";
-    }
-
-    if (score >= 50) {
-      return "#8D45FF";
-    }
-
-    return "#7B7CFF";
-  };
-
-  const getIconDetails = (alert: AlertItem) => {
-    if (alert.score >= 80) {
-      return {
-        icon: "phone-portrait-outline" as const,
-        color: "#FF315E",
-        background: "#501129",
-      };
-    }
-
-    if (alert.score >= 60) {
-      return {
-        icon: "call-outline" as const,
-        color: "#00DB78",
-        background: "#063E28",
-      };
-    }
-
-    return {
-      icon: "chatbubble-outline" as const,
-      color: "#8D8DFF",
-      background: "#101A51",
-    };
-  };
 
   const renderAlert = (alert: AlertItem) => {
     const riskColor = getRiskColor(alert.score);
     const iconDetails = getIconDetails(alert);
-
+    console.log(alert);
     return (
       <TouchableOpacity
         key={alert.id}
         style={styles.alertRow}
         activeOpacity={0.8}
         onPress={() => {
-          console.log("Alert selected:", alert.sender);
+          router.push({
+            pathname: routes.messages.detail,
+            params: {
+              id: alert.id,
+            },
+            
+          });
         }}
       >
         <View

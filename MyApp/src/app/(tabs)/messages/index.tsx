@@ -13,6 +13,7 @@ import { typography } from "@/constants/typography";
 import { router } from "expo-router";
 import { routes } from "@/constants/routes";
 import { formatMessageTime, getRiskBackground, getRiskColor } from "@/utils/messageRisk";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function AllMessagesScreen() {
   const [activeFilter, setActiveFilter] = useState("All");
@@ -133,7 +134,7 @@ export default function AllMessagesScreen() {
           const riskColor = getRiskColor(message.finalRisk.riskLevel);
 
           const riskBackground = getRiskBackground(message.finalRisk.riskLevel);
-
+          console.log(message)
           return (
             <TouchableOpacity
               key={message.id}
@@ -162,17 +163,12 @@ export default function AllMessagesScreen() {
                       },
                     ]}
                   >
-                    <Text
-                      style={[
-                        styles.messageIcon,
-                        {
-                          color: riskColor,
-                        },
-                      ]}
-                    >
-                      ✉
-                    </Text>
-                  </View>
+                    <Ionicons
+                      name="mail-outline"
+                      size={20}
+                      color={riskColor}
+                    />
+                    </View>
 
                   {/* SENDER INFORMATION */}
 

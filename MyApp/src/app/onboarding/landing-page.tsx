@@ -24,16 +24,6 @@ export default function LoginScreen() {
           rightIcon= {require('@/assets/images/onboarding/arrow-right.png')}
           />
 
-          <SocialButton provider="Google" onPress={() => {
-            // Handle sign up button press
-          }}
-          />
-
-          <SocialButton provider="Apple" onPress={() => {
-            // Handle sign up button press
-          }}
-          />
-
           <View style = {styles.signup}>
             <Text style = {styles.signupText}>Don't have an account? 
               
