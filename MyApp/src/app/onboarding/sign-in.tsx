@@ -14,6 +14,7 @@ import * as SecureStore from 'expo-secure-store';
 import AppInput from '@/components/form/AppInput';
 import { Image } from 'react-native';
 import PrimaryButton from '@/components/buttons/PrimaryButton';
+import { routes } from '@/constants/routes';
 
 export default function SignInScreen() {
   const [email, setEmail] = useState('');
@@ -72,7 +73,7 @@ export default function SignInScreen() {
         );
 
        
-        router.replace('/(tabs)/dashboard');
+        router.replace(routes.onboarding.allowAccess);
       } else {
         Alert.alert(
           'Error',
