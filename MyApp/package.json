@@ -59,7 +59,8 @@
     "copy:onnx": "node scripts/copy-onnx-model.js",
     "android:run": "npm run copy:onnx && npx expo run:android",
     "android:prebuild": "npx expo prebuild --clean && npm run copy:onnx",
-    "test": "jest"
+    "test": "jest",
+    "eas-build-post-install": "npm run copy:onnx"
   },
   "jest": {
     "preset": "jest-expo"
